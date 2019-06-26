@@ -1,15 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-
-export default class Screen extends React.Component {
-  render() {
-    return (
-      <View style={ styles.container }>
-        { this.props.children }
-      </View>
-    );
-  }
-}
+import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
   container: {
@@ -17,3 +8,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+export default class Screen extends React.Component {
+  render() {
+    const { children } = this.props;
+    return (
+      <View style={styles.container}>
+        {children}
+      </View>
+    );
+  }
+}
+
+Screen.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.array
+  ]).isRequired
+};

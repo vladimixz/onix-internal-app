@@ -16,21 +16,21 @@ const Home = {
 const Profile = {
   screen: ProfileScreen,
   navigationOptions: {
-    title: "Profile",
+    title: 'Profile',
   }
 };
 
 const News = {
   screen: NewsScreen,
   navigationOptions: {
-    title: "News",
+    title: 'News',
   }
 };
 
 const Contact = {
   screen: ContactScreen,
   navigationOptions: {
-    title: "Contact",
+    title: 'Contact',
   }
 };
 

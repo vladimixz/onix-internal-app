@@ -1,39 +1,10 @@
 import React from 'react';
-import { Button, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
-import { SecureStore } from 'expo';
-
-export default class AuthButtons extends React.Component {
-
-  async logIn() {
-    let userProfile = await SecureStore.getItemAsync('userProfile');
-    if (!userProfile) {
-      const { navigate } = this.props.navigation;
-      const { manifest } = Expo.Constants;
-      const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync(manifest.facebookAppId, {
-        permissions: ['public_profile', 'email'],
-      });
-      if (type === 'success') {
-        const response = await fetch(`https://graph.facebook.com/me?fields=id,name,email,picture.width(400).height(400)&access_token=${token}`)
-          .then(res => res.json())
-          .then(res => {
-            SecureStore.setItemAsync('userProfile', JSON.stringify(res));
-            navigate('Home', { redirect: 'Profile' })
-          });
-      }
-    }
-
-  }
-
-  render() {
-    return (
-      <View style={ styles.buttons }>
-        <TouchableOpacity style={ styles.loginButton } onPress={ this.logIn.bind(this) }>
-          <Text style={ styles.whiteText }>Continue with facebook</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-}
+import {
+  StyleSheet, View, TouchableOpacity, Text
+} from 'react-native';
+import PropTypes from 'prop-types';
+import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 
 const styles = StyleSheet.create({
   buttons: {
@@ -56,3 +27,41 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   }
 });
+
+export default class AuthButtons extends React.Component {
+  logIn = async () => {
+    const userProfile = await SecureStore.getItemAsync('userProfile');
+    if (!userProfile) {
+      /* global Expo */
+      const { navigation } = this.props;
+      const { manifest } = Constants;
+      const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync(manifest.facebookAppId, {
+        permissions: ['public_profile', 'email'],
+      });
+      if (type === 'success') {
+        fetch(`https://graph.facebook.com/me?fields=id,name,email,picture.width(400).height(400)&access_token=${token}`)
+          .then(res => res.json())
+          .then((res) => {
+            SecureStore.setItemAsync('userProfile', JSON.stringify(res));
+            navigation.navigate('Home', { redirect: 'Profile' });
+          });
+      }
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.buttons}>
+        <TouchableOpacity style={styles.loginButton} onPress={this.logIn}>
+          <Text style={styles.whiteText}>Continue with facebook</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+AuthButtons.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired
+  }).isRequired,
+};
